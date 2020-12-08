@@ -9,10 +9,12 @@ class MButton extends StatelessWidget {
     this.onPressed,
     this.loading,
     this.disabled,
+    this.flex,
     this.backgroundColor,
   }) : super(key: key);
 
   final String label;
+  final int flex;
   final Widget leadingIcon;
   final Widget trailingIcon;
   final Function onPressed;
@@ -45,6 +47,9 @@ class MButton extends StatelessWidget {
             : Text(
                 label != null ? label : 'Button',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
               ),
       ),
     );
@@ -60,6 +65,7 @@ class MButton extends StatelessWidget {
         : Theme.of(context).primaryColor;
 
     return Expanded(
+      flex: flex ?? 2,
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: Opacity(

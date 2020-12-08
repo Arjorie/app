@@ -123,7 +123,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final node = FocusScope.of(context);
     PageModel data = widget.data;
-    final Color textColor = Theme.of(context).primaryColor;
+    final Color textColor = Colors.white;
     final TextStyle textFieldStyle =
         TextStyle(fontSize: 18.0, color: textColor);
 

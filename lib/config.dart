@@ -1,30 +1,98 @@
 import 'package:app/models/AccountModel.dart';
+import 'package:app/models/OrderModel.dart';
 import 'package:flutter/material.dart';
 
+import 'component/common/Categories.dart';
 import 'models/CategoryModel.dart';
 
 class AppGlobalConfig {
   static final AppGlobalConfig _singleton = AppGlobalConfig._internal();
-  AccountModel account = AccountModel();
+  static AccountModel account = AccountModel();
+  static OrderModel orders = OrderModel();
   static String server = 'http://192.168.254.103:4200';
-  static String tableIdToOrder = '';
 
   // Colors
   static Color primaryColor = Color(0xFF5C6BC0);
   static Color warningColor = Colors.orange;
-  static List<CategoryModel> categories = [
-    CategoryModel(imgSrc: 'assets/img/beans.png', text: 'Rice & Beans'),
-    CategoryModel(imgSrc: 'assets/img/fish.png', text: 'Fish'),
-    CategoryModel(imgSrc: 'assets/img/pasta.png', text: 'Pasta'),
-    CategoryModel(imgSrc: 'assets/img/casserole.png', text: 'Casserole'),
-    CategoryModel(imgSrc: 'assets/img/salad.png', text: 'Salad'),
-    CategoryModel(imgSrc: 'assets/img/bbq.png', text: 'Grilled'),
-    CategoryModel(imgSrc: 'assets/img/dessert.png', text: 'Dessert'),
-    CategoryModel(imgSrc: 'assets/img/meat.png', text: 'Meat'),
-    CategoryModel(imgSrc: 'assets/img/soup.png', text: 'Soup'),
-    CategoryModel(imgSrc: 'assets/img/pizza.png', text: 'Pizza'),
-    CategoryModel(imgSrc: 'assets/img/veggie.png', text: 'Veggie'),
+  static Color successColor = Colors.green;
+
+  // Categories
+  List<CategoryModel> categories = [
+    CategoryModel(
+      imgSrc: 'assets/img/beans.png',
+      text: 'Rice & Beans',
+      value: 0,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/fish.png',
+      text: 'Fish',
+      value: 1,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/pasta.png',
+      text: 'Pasta',
+      value: 2,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/casserole.png',
+      text: 'Casserole',
+      value: 3,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/salad.png',
+      text: 'Salad',
+      value: 4,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/bbq.png',
+      text: 'Grilled',
+      value: 5,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/dessert.png',
+      text: 'Dessert',
+      value: 6,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/meat.png',
+      text: 'Meat',
+      value: 7,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/soup.png',
+      text: 'Soup',
+      value: 8,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/pizza.png',
+      text: 'Pizza',
+      value: 9,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/veggie.png',
+      text: 'Veggie',
+      value: 10,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/softdrinks.png',
+      text: 'Beverages',
+      value: 11,
+    ),
+    CategoryModel(
+      imgSrc: 'assets/img/liquor.png',
+      text: 'Liquor',
+      value: 12,
+    ),
   ];
+  List<Widget> getCategories() {
+    final self = this;
+    List<Widget> categoryCards = [];
+    self.categories.forEach((element) {
+      categoryCards
+          .add(CategoryCard(imgSrc: element.imgSrc, text: element.text));
+    });
+    return categoryCards;
+  }
 
   factory AppGlobalConfig() {
     return _singleton;

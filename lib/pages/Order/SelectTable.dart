@@ -30,7 +30,7 @@ class _SelectTableState extends State<SelectTable> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(milliseconds: 2400), () async => {this.getTableData()});
+    Timer(Duration(milliseconds: 200), () async => {this.getTableData()});
   }
 
   // ignore: slash_for_doc_comments
@@ -70,7 +70,7 @@ class _SelectTableState extends State<SelectTable> {
   }
 
   void gotoProducts(tableId) {
-    AppGlobalConfig.tableIdToOrder = tableId;
+    AppGlobalConfig.orders.tableId = tableId;
     Navigator.of(appContext).pushNamed(
       '/order-products',
     );

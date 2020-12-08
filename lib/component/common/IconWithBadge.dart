@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class IconWithBadge extends StatelessWidget {
+class IconWithBadge extends StatefulWidget {
   final int badgeCount;
   final Widget icon;
   final Color color;
@@ -16,14 +16,19 @@ class IconWithBadge extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _IconWithBadgeState createState() => _IconWithBadgeState();
+}
+
+class _IconWithBadgeState extends State<IconWithBadge> {
+  @override
   Widget build(BuildContext context) {
-    final badgeTextfontSize = fontSize != null ? fontSize : 14.0;
-    final finalBadgeCount = badgeCount != null ? badgeCount : 0;
-    final badgeColor = color != null ? color : Colors.red;
+    final badgeTextfontSize = widget.fontSize != null ? widget.fontSize : 14.0;
+    final finalBadgeCount = widget.badgeCount != null ? widget.badgeCount : 0;
+    final badgeColor = widget.color != null ? widget.color : Colors.red;
     return Stack(
       overflow: Overflow.visible,
       children: <Widget>[
-        icon,
+        widget.icon,
         Positioned(
           right: -(badgeTextfontSize * 0.5),
           top: -(badgeTextfontSize * 0.5),

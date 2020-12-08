@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:app/pages/Page3.dart';
 import 'package:app/pages/Home.dart';
 import 'package:app/pages/Login.dart';
 import 'package:app/pages/Splash.dart';
 import 'package:app/pages/Order/SelectTable.dart';
 import 'package:app/pages/Order/Products.dart';
+import 'package:app/pages/Order/ViewOrders.dart';
+import 'package:app/pages/Order/PaymentOptions.dart';
+import 'package:app/pages/Order/OrderConfirmation.dart';
 
 import 'package:app/models/PageModel.dart';
 
@@ -26,11 +28,17 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case '/order-products':
       return SlideRightRoute(widget: OrderProduct());
       break;
-    case '/page3':
-      return SlideRightRoute(widget: Page3());
+    case '/view-orders':
+      return SlideRightRoute(widget: ViewOrders());
+      break;
+    case '/payment-options':
+      return SlideRightRoute(widget: PaymentOptions());
+      break;
+    case '/order-confirmation':
+      return SlideRightRoute(widget: OrderConfirmation());
       break;
     default:
-      return SlideRightRoute(widget: Page3());
+      return SlideRightRoute(widget: Login(data: args));
       break;
   }
 }

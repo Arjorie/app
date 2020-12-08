@@ -1,21 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:app/component/common/Categories.dart';
-import 'package:app/component/decorators/TextStyle.dart';
+import 'package:app/component/common/ConfirmDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:app/component/common/SliverTitle.dart';
 import 'package:app/component/common/AlertDialog.dart';
 import 'package:app/component/common/ProductCard.dart';
 import 'package:app/component/common/ContainerWithBlurBackground.dart';
 import 'package:app/component/common/IconWithBadge.dart';
 import 'package:app/component/common/MButton.dart';
-import 'package:app/component/common/MenuButton.dart';
 import 'package:app/helpers/Storage.dart';
+import 'package:app/helpers/OrderProcess.dart';
 import 'package:app/models/PageModel.dart';
+import 'package:app/models/ProductModel.dart';
+import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 
 class OrderProduct extends StatefulWidget {
@@ -30,9 +31,12 @@ class _OrderProductState extends State<OrderProduct> {
    */
   bool isLoading = true;
   List<dynamic> products = [];
-  int badgeCount = 0;
-  List<Widget> categoryCards = [];
+  int badgeCount = AppGlobalConfig.orders.products?.length ?? 0;
+  List<Widget> categoryCards = AppGlobalConfig().getCategories();
   BuildContext appContext;
+  double appBarHeight = 120.0;
+  double categoryHeight = 100;
+  double loadingContainerHeight;
 
   // initState()
   // - on create/init hook/method of this class
@@ -77,52 +81,40 @@ class _OrderProductState extends State<OrderProduct> {
   @override
   Widget build(BuildContext context) {
     appContext = context;
-    AppGlobalConfig.categories.forEach((element) {
-      categoryCards
-          .add(CategoryCard(imgSrc: element.imgSrc, text: element.text));
-    });
+    loadingContainerHeight = MediaQuery.of(appContext).size.height -
+        appBarHeight -
+        categoryHeight -
+        160;
+    CircularProgressIndicator progressCircle = CircularProgressIndicator(
+      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+    );
 
-    return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Product Drawer'),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            ListTile(
-              title: Text('Item 1'),
-              onTap: () {
-                // Update the state of the app.
-                setState(() {
-                  badgeCount += 1;
-                });
-                // ...
-              },
-            ),
-            ListTile(
-              title: Text('Item 2'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverAppBar(
-                    expandedHeight: 120.0,
+    return WillPopScope(
+      onWillPop: () {
+        return showComfirmDialog(
+          context,
+          'Are you sure?',
+          'This will reset your current order. Please proceed with caution.',
+          (index) {
+            if (index == 0) {
+              AppGlobalConfig.orders.products = [];
+              AppGlobalConfig.orders.tableId = '';
+              AppGlobalConfig.orders.customerCount = 0;
+              Navigator.pop(context);
+            }
+          },
+        );
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  SliverAppBar(
+                    expandedHeight: appBarHeight,
                     floating: true,
                     snap: true,
-                    leading: MenuButton(),
                     flexibleSpace: FlexibleSpaceBar(
                       centerTitle: true,
                       background:
@@ -134,107 +126,117 @@ class _OrderProductState extends State<OrderProduct> {
                         icon: Icon(Icons.search_rounded),
                         onPressed: () {},
                       ),
-                      IconButton(
-                        icon: IconWithBadge(
-                          icon: SvgPicture.asset(
-                            'assets/svg/shopping.svg',
-                            color: Colors.white,
-                          ),
-                          badgeCount: badgeCount,
-                        ),
-                        tooltip: 'Add new entry',
-                        onPressed: () {},
-                      ),
-                    ]),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Category',
-                                style: AppGlobalStyles.boldTitle),
-                          ),
-                          SizedBox(
-                            height: 100,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: categoryCards,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    childCount: 1,
+                    ],
                   ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Category',
+                                  style: AppGlobalStyles.boldTitle),
+                            ),
+                            SizedBox(
+                              height: categoryHeight,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: categoryCards,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      childCount: 1,
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return SliverTitle(
+                          leftText: 'All Products',
+                        );
+                      },
+                      childCount: 1,
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext productContext, int index) {
+                        ProductModel product;
+                        if (isLoading == true) {
+                          return Container(
+                            height: loadingContainerHeight,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text('All Products',
-                                    style: AppGlobalStyles.boldTitle),
-                                // Text('View All',
-                                // style: AppGlobalStyles.primarySubtitle),
+                                Expanded(
+                                  flex: 2,
+                                  child: Center(
+                                    child: progressCircle,
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                    childCount: 1,
+                          );
+                        } else {
+                          product = ProductModel.fromJson(products[index]);
+                          return ProductCard(
+                            product: product,
+                            onTap: () => {
+                              onTapProductCard(
+                                productContext,
+                                product,
+                                (orderedProductCount) => {
+                                  setState(
+                                    () {
+                                      badgeCount = orderedProductCount;
+                                    },
+                                  ),
+                                },
+                              ),
+                            },
+                          );
+                        }
+                      },
+                      childCount: isLoading == true ? 1 : products.length,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                MButton(
+                  label: 'Checkout',
+                  onPressed: () => {},
+                  trailingIcon: IconWithBadge(
+                    icon: SvgPicture.asset(
+                      'assets/svg/cash-register.svg',
+                      color: Colors.white,
+                    ),
+                    color: Colors.green,
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      final product = products[index];
-                      return ProductCard(
-                          product: product,
-                          onTap: () => {print(product['product_id'])});
-                    },
-                    childCount: products.length ?? 0,
+                MButton(
+                  label: 'View Orders',
+                  onPressed: () =>
+                      {Navigator.pushNamed(context, '/view-orders')},
+                  trailingIcon: IconWithBadge(
+                    icon: SvgPicture.asset(
+                      'assets/svg/shopping.svg',
+                      color: Colors.white,
+                    ),
+                    badgeCount: badgeCount,
+                    color: Colors.green,
                   ),
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              MButton(
-                label: 'Checkout',
-                onPressed: () => {},
-                trailingIcon: IconWithBadge(
-                  icon: SvgPicture.asset(
-                    'assets/svg/cash-register.svg',
-                    color: Colors.white,
-                  ),
-                  color: Colors.green,
-                ),
-              ),
-              MButton(
-                label: 'View Orders',
-                onPressed: () => {},
-                trailingIcon: IconWithBadge(
-                  icon: SvgPicture.asset(
-                    'assets/svg/shopping.svg',
-                    color: Colors.white,
-                  ),
-                  badgeCount: 20,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

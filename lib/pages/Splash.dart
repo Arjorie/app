@@ -52,7 +52,7 @@ class _SplashState extends State<Splash> {
         final accessToken = record['access_token'];
         final rawAccount = record['employee'];
         final AccountModel account = AccountModel.fromJson(rawAccount);
-        globalConfig.account = account;
+        AppGlobalConfig.account = account;
         localStorage.setString('accessToken', accessToken);
         Navigator.of(context).pushReplacementNamed(
           '/home',

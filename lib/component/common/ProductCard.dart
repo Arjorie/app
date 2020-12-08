@@ -1,7 +1,12 @@
+import 'package:app/component/common/BoxGradient.dart';
 import 'package:app/component/common/ProductPicture.dart';
 import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
+import 'package:app/models/ProductModel.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+NumberFormat pesoFormat = NumberFormat.currency(locale: "en_PH", symbol: "₱");
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -11,91 +16,175 @@ class ProductCard extends StatelessWidget {
   }) : super(key: key);
 
   final double cardHeight = 120.0;
-  final product;
+  final ProductModel product;
   final Function onTap;
 
   @override
   Widget build(BuildContext context) {
-    final discount =
-        product['discount'] != 0 ? '${product['discount']}% Off!' : '';
-    final description = product['description'].toString();
-    final quantity = product['quantity'] ?? 0;
-    final discountToDeduct =
-        product['discount'] == 0 ? 0 : (product['discount'] / 100);
-    final originalPrice = product['price'];
-    final totalServings = product['servings'];
-    final lastPrice = originalPrice - (originalPrice * discountToDeduct);
+    final discount = product.discountText;
+    final description = product.description;
+    final quantity = product.quantity;
+    final originalPrice = product.originalPrice;
+    final totalServings = product.totalServings;
+    final finalPrice = product.finalPrice;
     final maxDescriptionLength =
         description.length > 100 ? 100 : description.length;
     return Container(
       alignment: Alignment.center,
-      margin: EdgeInsets.only(bottom: 10.0),
       height: cardHeight,
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        elevation: quantity == 0 ? 0 : 2,
         child: Opacity(
-          opacity: quantity == 0 ? 0.5 : 1,
+          opacity: quantity == 0 ? 0.4 : 1,
           child: InkWell(
             onTap: quantity == 0 ? null : () => {onTap()},
             child: Row(
               children: [
-                ProductPicture(
-                  imgSrc:
-                      '${AppGlobalConfig.server}/public/products/${product['image']}',
-                  width: cardHeight,
-                  height: cardHeight,
+                Expanded(
+                  flex: 2,
+                  child: Stack(
+                    alignment: Alignment.bottomLeft,
+                    children: [
+                      ProductPicture(
+                        imgSrc:
+                            '${AppGlobalConfig.server}/public/products/${product.productImage}',
+                        width: 120,
+                        height: cardHeight,
+                      ),
+                      BoxGradient(
+                        height: 50.0,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0),
+                          Colors.black.withOpacity(0.7),
+                          Colors.black.withOpacity(0.9),
+                        ],
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '$quantity left',
+                            style: TextStyle(
+                              fontSize: AppGlobalStyles.subtitleFontSize,
+                              color: Colors.white.withOpacity(0.8),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
-                  flex: 1,
+                  flex: 3,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${product['name']}',
-                          style: AppGlobalStyles.primaryBoldHeading,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${product.productName}',
+                              style: AppGlobalStyles.primaryBoldHeading,
+                            ),
+                            Container(
+                              child: Text(
+                                '${description.substring(0, maxDescriptionLength)}',
+                                style: AppGlobalStyles.paragraph,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          totalServings == 1
-                              ? '$totalServings serving'
-                              : '$totalServings servings',
-                          style: AppGlobalStyles.orangeBoldCaption,
-                        ),
-                        Container(
-                          child: Text(
-                            '${description.substring(0, maxDescriptionLength)}',
-                            style: AppGlobalStyles.paragraph,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        Text(
-                          '₱${lastPrice.toStringAsFixed(2)}',
-                          style: AppGlobalStyles.orangeBoldHeading,
-                        ),
-                        Text(
-                            discount != ''
-                                ? '₱${originalPrice.toStringAsFixed(2)}'
-                                : '',
-                            style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.redAccent.withOpacity(0.8),
-                              fontWeight: FontWeight.bold,
-                            )),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${pesoFormat.format(finalPrice)}',
+                              style: AppGlobalStyles.orangeBoldHeading,
+                            ),
+                            Container(
+                              height: discount != ''
+                                  ? AppGlobalStyles.captionFontSize
+                                  : 0,
+                              child: discount != ''
+                                  ? Text(
+                                      '${pesoFormat.format(originalPrice)}',
+                                      style: TextStyle(
+                                        decoration: TextDecoration.lineThrough,
+                                        fontSize:
+                                            AppGlobalStyles.captionFontSize,
+                                        color:
+                                            Colors.redAccent.withOpacity(0.8),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            Container(
+                              height: quantity == 0
+                                  ? AppGlobalStyles.titleFontSize
+                                  : 0,
+                              child: quantity == 0
+                                  ? Text(
+                                      'Not Available',
+                                      style: TextStyle(
+                                        fontSize: AppGlobalStyles.titleFontSize,
+                                        color:
+                                            Colors.redAccent.withOpacity(0.8),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
                 ),
                 Expanded(
-                  flex: 0,
+                  flex: 1,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 50.0,
-                        height: 50.0,
+                        height: (cardHeight * 0.5) - 4,
+                        padding: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          // shape: BoxShape.circle,
+                          color: AppGlobalConfig.primaryColor,
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            totalServings == 1
+                                ? '$totalServings Serving'
+                                : '$totalServings Servings',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: AppGlobalStyles.captionFontSize,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: (cardHeight * 0.5) - 4,
                         decoration: discount != ''
                             ? BoxDecoration(color: Colors.orangeAccent)
                             : null,

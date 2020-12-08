@@ -16,12 +16,14 @@ class ProductPicture extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      // padding: const EdgeInsets.all(8.0),
       child: ClipRRect(
+        // borderRadius: BorderRadius.all(Radius.circular(4)),
         borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(4), topLeft: Radius.circular(4)),
         child: FadeInImage.assetNetwork(
           placeholder: 'assets/logo.png',
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
           image: imgSrc,
         ),
       ),

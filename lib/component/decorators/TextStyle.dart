@@ -95,8 +95,24 @@ class AppGlobalStyles {
     color: AppGlobalConfig.warningColor,
   );
 
+  static TextStyle primaryHeading = TextStyle(
+    fontSize: headingFontSize,
+    color: AppGlobalConfig.primaryColor,
+  );
+  static TextStyle primaryTitle = TextStyle(
+    fontSize: titleFontSize,
+    color: AppGlobalConfig.primaryColor,
+  );
   static TextStyle primarySubtitle = TextStyle(
     fontSize: subtitleFontSize,
+    color: AppGlobalConfig.primaryColor,
+  );
+  static TextStyle primaryParagraph = TextStyle(
+    fontSize: paragraphFontSize,
+    color: AppGlobalConfig.primaryColor,
+  );
+  static TextStyle primaryCaption = TextStyle(
+    fontSize: captionFontSize,
     color: AppGlobalConfig.primaryColor,
   );
 
