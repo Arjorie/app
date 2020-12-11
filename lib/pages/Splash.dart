@@ -35,7 +35,6 @@ class _SplashState extends State<Splash> {
   }
 
   Future refreshToken() async {
-    print(AppGlobalConfig.server);
     final String token = await localStorage.getString('accessToken');
     final String authorizationHeader = 'Basic $token';
     try {

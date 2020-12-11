@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app/store/OrderStore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +10,7 @@ import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 import 'package:app/helpers/Storage.dart';
 import 'package:app/models/PageModel.dart';
+import 'package:provider/provider.dart';
 
 class SelectTable extends StatefulWidget {
   @override
@@ -39,7 +41,6 @@ class _SelectTableState extends State<SelectTable> {
    */
   /* Retrieve table data */
   Future getTableData() async {
-    print(AppGlobalConfig.server);
     final String token = await localStorage.getString('accessToken');
     final String authorizationHeader = 'Basic $token';
     final response = await http.get(
@@ -69,8 +70,10 @@ class _SelectTableState extends State<SelectTable> {
     }
   }
 
-  void gotoProducts(tableId) {
-    AppGlobalConfig.orders.tableId = tableId;
+  void gotoProducts(tableId, customerCount) {
+    final orderStore = Provider.of<OrderStore>(appContext, listen: false);
+    orderStore.tableId = tableId;
+    orderStore.customerCount = customerCount;
     Navigator.of(appContext).pushNamed(
       '/order-products',
     );
@@ -102,6 +105,7 @@ class _SelectTableState extends State<SelectTable> {
                   final String tableShape =
                       tables[index]['shape']?.toString()?.toUpperCase();
                   final String tableId = tables[index]['table_id'];
+                  final int customerCount = tables[index]['chairs'];
                   List<Widget> tableWidgets = [];
                   if (tableSequence != null)
                     tableWidgets.add(Text('Table #$tableSequence',
@@ -118,7 +122,9 @@ class _SelectTableState extends State<SelectTable> {
 
                   return Card(
                     child: InkWell(
-                      onTap: () => {gotoProducts(tableId)},
+                      onTap: () {
+                        gotoProducts(tableId, customerCount);
+                      },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -130,7 +136,6 @@ class _SelectTableState extends State<SelectTable> {
                                 'assets/svg/table-chair-colored.svg',
                                 width: 80,
                                 height: 70,
-                                // color: Theme.of(context).primaryColor,
                               ),
                             ),
                           ),

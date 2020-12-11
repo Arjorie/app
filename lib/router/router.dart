@@ -3,7 +3,7 @@ import 'package:app/pages/Home.dart';
 import 'package:app/pages/Login.dart';
 import 'package:app/pages/Splash.dart';
 import 'package:app/pages/Order/SelectTable.dart';
-import 'package:app/pages/Order/Products.dart';
+import 'package:app/pages/Order/OrderProducts.dart';
 import 'package:app/pages/Order/ViewOrders.dart';
 import 'package:app/pages/Order/PaymentOptions.dart';
 import 'package:app/pages/Order/OrderConfirmation.dart';
@@ -15,27 +15,29 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
   switch (settings.name) {
     case '/':
-      return SlideRightRoute(widget: Splash());
+      return SlideRightRoute(widget: Splash(), name: '/');
     case '/login':
-      return SlideRightRoute(widget: Login(data: args));
+      return SlideRightRoute(widget: Login(data: args), name: '/login');
       break;
     case '/home':
-      return SlideRightRoute(widget: Home());
+      return SlideRightRoute(widget: Home(), name: '/home');
       break;
     case '/select-table':
-      return SlideRightRoute(widget: SelectTable());
+      return SlideRightRoute(widget: SelectTable(), name: '/select-table');
       break;
     case '/order-products':
-      return SlideRightRoute(widget: OrderProduct());
+      return SlideRightRoute(widget: OrderProducts(), name: '/order-products');
       break;
     case '/view-orders':
-      return SlideRightRoute(widget: ViewOrders());
+      return SlideRightRoute(widget: ViewOrders(), name: '/view-orders');
       break;
     case '/payment-options':
-      return SlideRightRoute(widget: PaymentOptions());
+      return SlideRightRoute(
+          widget: PaymentOptions(), name: '/payment-options');
       break;
     case '/order-confirmation':
-      return SlideRightRoute(widget: OrderConfirmation());
+      return SlideRightRoute(
+          widget: OrderConfirmation(), name: '/order-confirmation');
       break;
     default:
       return SlideRightRoute(widget: Login(data: args));
@@ -46,12 +48,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 // Screen animation
 class SlideRightRoute extends PageRouteBuilder {
   final Widget widget;
-  SlideRightRoute({this.widget})
+  final String name;
+  SlideRightRoute({this.widget, this.name})
       : super(
           pageBuilder: (BuildContext context, Animation<double> animation,
               Animation<double> secondaryAnimation) {
             return widget;
           },
+          settings: RouteSettings(name: name),
+          transitionDuration: Duration(milliseconds: 400),
           transitionsBuilder: (BuildContext context,
               Animation<double> animation,
               Animation<double> secondaryAnimation,
@@ -60,6 +65,7 @@ class SlideRightRoute extends PageRouteBuilder {
             var end = Offset.zero;
             var curve = Curves.ease;
             var tween =
+                // Tween(begin: begin, end: end);
                 Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
             var offsetAnimation = animation.drive(tween);
             return SlideTransition(

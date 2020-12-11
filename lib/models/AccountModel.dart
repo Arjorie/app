@@ -21,16 +21,16 @@ class AccountModel {
       this.role});
 
   factory AccountModel.fromJson(Map<String, dynamic> account) {
-    print(account);
     final roles = ['Waiter', 'Cashier'];
     final accountRole = roles[account['role']];
+    final accountProfile = account['employee_profile'];
     return AccountModel(
       username: account['username'],
-      firstName: account['first_name'],
-      lastName: account['last_name'],
-      gender: account['gender'],
-      birthDate: account['birth_date'],
-      profilePicture: account['profile_picture'],
+      firstName: accountProfile['first_name'],
+      lastName: accountProfile['last_name'],
+      gender: accountProfile['gender'],
+      birthDate: accountProfile['birth_date'],
+      profilePicture: accountProfile['profile_picture'],
       status: account['status'],
       role: accountRole,
     );

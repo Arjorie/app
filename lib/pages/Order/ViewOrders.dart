@@ -5,7 +5,9 @@ import 'package:app/component/common/SliverTitle.dart';
 import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 import 'package:app/models/ProductModel.dart';
+import 'package:app/store/OrderStore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ViewOrders extends StatefulWidget {
   ViewOrders({Key key}) : super(key: key);
@@ -16,9 +18,9 @@ class ViewOrders extends StatefulWidget {
 
 class _ViewOrdersState extends State<ViewOrders> {
   double totalPrice = 0.0;
-  double getTotalPrice() {
+  double getTotalPrice(OrderStore orderStore) {
     totalPrice = 0.0;
-    AppGlobalConfig.orders.products
+    orderStore.orders
         .map(
           (product) => {
             totalPrice = (product.finalPrice * product.orderCount) + totalPrice
@@ -30,7 +32,8 @@ class _ViewOrdersState extends State<ViewOrders> {
 
   @override
   Widget build(BuildContext context) {
-    totalPrice = getTotalPrice();
+    final orderStore = Provider.of<OrderStore>(context);
+    totalPrice = getTotalPrice(orderStore);
     return Scaffold(
       body: Column(
         children: [
@@ -60,7 +63,7 @@ class _ViewOrdersState extends State<ViewOrders> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                      if (AppGlobalConfig.orders.products.length == 0) {
+                      if (orderStore.totalOrders == 0) {
                         return Container(
                           height: MediaQuery.of(context).size.height - 200,
                           child: Center(
@@ -71,31 +74,30 @@ class _ViewOrdersState extends State<ViewOrders> {
                           ),
                         );
                       } else {
-                        final product = AppGlobalConfig.orders.products[index];
+                        final product = orderStore.orders[index];
                         return ProductOrderedCard(
                           product: product,
                           onIncrementOrder: () => {
                             setState(() {
-                              totalPrice = getTotalPrice();
+                              totalPrice = getTotalPrice(orderStore);
                             })
                           },
                           onDecrementOrder: () => {
                             setState(() {
-                              totalPrice = getTotalPrice();
+                              totalPrice = getTotalPrice(orderStore);
                             })
                           },
                           onRemoveOrder: (ProductModel orderToRemove) {
                             setState(() {
-                              AppGlobalConfig.orders.products
-                                  .remove(orderToRemove);
+                              orderStore.removeOrder(orderToRemove);
                             });
                           },
                         );
                       }
                     },
-                    childCount: AppGlobalConfig.orders.products.length == 0
+                    childCount: orderStore.totalOrders == 0
                         ? 1
-                        : AppGlobalConfig.orders.products.length,
+                        : orderStore.totalOrders,
                   ),
                 ),
               ],
@@ -114,7 +116,7 @@ class _ViewOrdersState extends State<ViewOrders> {
                   ],
                   color: Colors.white,
                 ),
-                child: AppGlobalConfig.orders.products.length == 0
+                child: orderStore.totalOrders == 0
                     ? null
                     : Column(
                         children: [
@@ -124,8 +126,8 @@ class _ViewOrdersState extends State<ViewOrders> {
                               padding: const EdgeInsets.fromLTRB(
                                   20.0, 8.0, 20.0, 8.0),
                               child: Text(
-                                  'You have ${AppGlobalConfig.orders.products.length} ' +
-                                      '${AppGlobalConfig.orders.products.length == 1 ? 'item' : 'items'} ' +
+                                  'You have ${orderStore.totalOrders} ' +
+                                      '${orderStore.totalOrders == 1 ? 'item' : 'items'} ' +
                                       ' in your list. Please confirm to proceed.',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
@@ -139,7 +141,7 @@ class _ViewOrdersState extends State<ViewOrders> {
                           Container(
                             child: Center(
                               child: Text(
-                                'Total of: ${pesoFormat.format(getTotalPrice())}',
+                                'Total of: ${pesoFormat.format(getTotalPrice(orderStore))}',
                                 style: TextStyle(
                                   color: AppGlobalConfig.warningColor,
                                   fontSize: AppGlobalStyles.headingFontSize,

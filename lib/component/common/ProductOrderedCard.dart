@@ -179,7 +179,7 @@ class _ProductOrderedCardState extends State<ProductOrderedCard> {
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            if (widget.product.orderCount <=
+                            if (widget.product.orderCount <
                                 widget.product.quantity) {
                               widget.product.orderCount =
                                   widget.product.orderCount + 1;
@@ -189,7 +189,7 @@ class _ProductOrderedCardState extends State<ProductOrderedCard> {
                           });
                         },
                         child: Opacity(
-                          opacity: widget.product.quantity <
+                          opacity: widget.product.quantity <=
                                   widget.product.orderCount
                               ? 0.5
                               : 1,

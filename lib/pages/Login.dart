@@ -90,13 +90,14 @@ class _LoginState extends State<Login> {
     setState(() {
       isLoading = false;
     });
-    print(response.body);
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = jsonDecode(response.body);
       final record = result['record'];
       final accessToken = record['access_token'];
       final rawAccount = record['employee'];
-      AccountModel.fromJson(rawAccount);
+      final account = AccountModel.fromJson(rawAccount);
+      AppGlobalConfig.account = account;
       localStorage.setString('accessToken', accessToken);
       Navigator.of(context).pushReplacementNamed(
         '/home',

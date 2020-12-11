@@ -4,11 +4,13 @@ import 'package:app/component/common/MButton.dart';
 import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 import 'package:app/models/ProductModel.dart';
+import 'package:app/store/OrderStore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
-Future onTapProductCard(BuildContext context, product, Function callback) {
+Future onTapProductCard(BuildContext context, product) {
   return showMaterialModalBottomSheet(
     backgroundColor: Colors.transparent,
     enableDrag: true,
@@ -16,7 +18,6 @@ Future onTapProductCard(BuildContext context, product, Function callback) {
     bounce: true,
     context: context,
     builder: (context) => BottomSheetContent(
-      callback: callback,
       product: product,
       rawProductData: product,
     ),
@@ -26,12 +27,10 @@ Future onTapProductCard(BuildContext context, product, Function callback) {
 class BottomSheetContent extends StatefulWidget {
   const BottomSheetContent({
     Key key,
-    @required this.callback,
     @required this.product,
     @required this.rawProductData,
   }) : super(key: key);
 
-  final callback;
   final product;
   final rawProductData;
 
@@ -40,6 +39,7 @@ class BottomSheetContent extends StatefulWidget {
 }
 
 class _BottomSheetContentState extends State<BottomSheetContent> {
+  // class data/property members
   ProductModel product;
   double finalPrice;
   int orderCount = 1;
@@ -55,14 +55,12 @@ class _BottomSheetContentState extends State<BottomSheetContent> {
     totalPrice = finalPrice.toDouble() * orderCount.toDouble();
   }
 
-  onPlaceOrder(BuildContext context1, int orderCount, dynamic product,
-      Function callback) {
-    if (AppGlobalConfig.orders.products == null) {
-      AppGlobalConfig.orders.products = [];
-    }
+  // Place order locally
+  onPlaceOrder(BuildContext context, int orderCount, dynamic product) {
+    final orderStore = Provider.of<OrderStore>(context, listen: false);
     product.orderCount = orderCount;
-    AppGlobalConfig.orders.products.add(product);
-    callback(AppGlobalConfig.orders.products.length);
+
+    orderStore.addOrder(product);
     Navigator.pop(context);
   }
 
@@ -259,6 +257,7 @@ class _BottomSheetContentState extends State<BottomSheetContent> {
                           MButton(
                             label: '-',
                             flex: 2,
+                            disabled: orderCount == 1,
                             onPressed: () => {
                               setState(() {
                                 if (orderCount > 1) orderCount = orderCount - 1;
@@ -294,9 +293,10 @@ class _BottomSheetContentState extends State<BottomSheetContent> {
                           MButton(
                             label: '+',
                             flex: 2,
+                            disabled: orderCount == product.quantity,
                             onPressed: () => {
                               setState(() {
-                                if (orderCount <= product.quantity)
+                                if (orderCount < product.quantity)
                                   orderCount = orderCount + 1;
                                 totalPrice = finalPrice.toDouble() *
                                     orderCount.toDouble();
@@ -326,8 +326,8 @@ class _BottomSheetContentState extends State<BottomSheetContent> {
                         flex: 2,
                         backgroundColor: AppGlobalConfig.primaryColor,
                         onPressed: () => {
-                          onPlaceOrder(context, orderCount,
-                              widget.rawProductData, widget.callback)
+                          onPlaceOrder(
+                              context, orderCount, widget.rawProductData)
                         },
                       ),
                       MButton(

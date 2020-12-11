@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app/component/common/ConfirmDialog.dart';
+import 'package:app/store/OrderStore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
@@ -18,20 +19,20 @@ import 'package:app/models/PageModel.dart';
 import 'package:app/models/ProductModel.dart';
 import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
+import 'package:provider/provider.dart';
 
-class OrderProduct extends StatefulWidget {
+class OrderProducts extends StatefulWidget {
   @override
-  _OrderProductState createState() => _OrderProductState();
+  _OrderProductsState createState() => _OrderProductsState();
 }
 
-class _OrderProductState extends State<OrderProduct> {
+class _OrderProductsState extends State<OrderProducts> {
   // ignore: slash_for_doc_comments
   /**
    * Page Data
    */
   bool isLoading = true;
   List<dynamic> products = [];
-  int badgeCount = AppGlobalConfig.orders.products?.length ?? 0;
   List<Widget> categoryCards = AppGlobalConfig().getCategories();
   BuildContext appContext;
   double appBarHeight = 120.0;
@@ -80,31 +81,38 @@ class _OrderProductState extends State<OrderProduct> {
 
   @override
   Widget build(BuildContext context) {
+    final orderState = Provider.of<OrderStore>(context);
+    int badgeCount = orderState.totalOrders ?? 0;
     appContext = context;
     loadingContainerHeight = MediaQuery.of(appContext).size.height -
         appBarHeight -
         categoryHeight -
         160;
+    if (loadingContainerHeight < 200) loadingContainerHeight = 200;
     CircularProgressIndicator progressCircle = CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
     );
 
+    // the widgetree
     return WillPopScope(
+      // when user taps the back/softback key button
       onWillPop: () {
         return showComfirmDialog(
+          //shows a confirm dialog
           context,
           'Are you sure?',
           'This will reset your current order. Please proceed with caution.',
           (index) {
+            // reset order list
             if (index == 0) {
-              AppGlobalConfig.orders.products = [];
-              AppGlobalConfig.orders.tableId = '';
-              AppGlobalConfig.orders.customerCount = 0;
+              orderState.resetOrder();
+              orderState.tableId = '';
               Navigator.pop(context);
             }
           },
         );
       },
+      // Page Scaffold
       child: Scaffold(
         body: Column(
           children: [
@@ -162,64 +170,16 @@ class _OrderProductState extends State<OrderProduct> {
                       childCount: 1,
                     ),
                   ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext productContext, int index) {
-                        ProductModel product;
-                        if (isLoading == true) {
-                          return Container(
-                            height: loadingContainerHeight,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Center(
-                                    child: progressCircle,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          product = ProductModel.fromJson(products[index]);
-                          return ProductCard(
-                            product: product,
-                            onTap: () => {
-                              onTapProductCard(
-                                productContext,
-                                product,
-                                (orderedProductCount) => {
-                                  setState(
-                                    () {
-                                      badgeCount = orderedProductCount;
-                                    },
-                                  ),
-                                },
-                              ),
-                            },
-                          );
-                        }
-                      },
-                      childCount: isLoading == true ? 1 : products.length,
-                    ),
-                  ),
+                  ProductList(
+                      isLoading: isLoading,
+                      loadingContainerHeight: loadingContainerHeight,
+                      progressCircle: progressCircle,
+                      products: products),
                 ],
               ),
             ),
             Row(
               children: [
-                MButton(
-                  label: 'Checkout',
-                  onPressed: () => {},
-                  trailingIcon: IconWithBadge(
-                    icon: SvgPicture.asset(
-                      'assets/svg/cash-register.svg',
-                      color: Colors.white,
-                    ),
-                    color: Colors.green,
-                  ),
-                ),
                 MButton(
                   label: 'View Orders',
                   onPressed: () =>
@@ -237,6 +197,116 @@ class _OrderProductState extends State<OrderProduct> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ProductList extends StatelessWidget {
+  const ProductList({
+    Key key,
+    @required this.isLoading,
+    @required this.loadingContainerHeight,
+    @required this.progressCircle,
+    @required this.products,
+  }) : super(key: key);
+
+  final bool isLoading;
+  final double loadingContainerHeight;
+  final CircularProgressIndicator progressCircle;
+  final List products;
+
+  @override
+  Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+    final appWidth = MediaQuery.of(context).size.width;
+    final itemWidth =
+        (isLoading == true && appWidth > 670) ? appWidth : appWidth / 2;
+    print(appWidth);
+    final itemHeight = 122;
+    final aspectRatio = isLoading == true ? 1 : (itemWidth / itemHeight);
+    return orientation == Orientation.portrait
+        ? SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext productContext, int index) {
+                ProductModel product;
+                if (isLoading == true) {
+                  return ProductListItem(
+                      loadingContainerHeight: loadingContainerHeight,
+                      progressCircle: progressCircle);
+                } else {
+                  product = ProductModel.fromJson(products[index]);
+                  return ProductCard(
+                    product: product,
+                    onTap: () => {
+                      onTapProductCard(
+                        productContext,
+                        product,
+                      ),
+                    },
+                  );
+                }
+              },
+              childCount: isLoading == true ? 1 : products.length,
+            ),
+          )
+        : SliverGrid(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: itemWidth,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              childAspectRatio: aspectRatio,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext productContext, int index) {
+                ProductModel product;
+                if (isLoading == true) {
+                  return ProductListItem(
+                      loadingContainerHeight: loadingContainerHeight,
+                      progressCircle: progressCircle);
+                } else {
+                  product = ProductModel.fromJson(products[index]);
+                  return ProductCard(
+                    product: product,
+                    onTap: () => {
+                      onTapProductCard(
+                        productContext,
+                        product,
+                      ),
+                    },
+                  );
+                }
+              },
+              childCount: isLoading == true ? 1 : products.length,
+            ),
+          );
+  }
+}
+
+class ProductListItem extends StatelessWidget {
+  const ProductListItem({
+    Key key,
+    @required this.loadingContainerHeight,
+    @required this.progressCircle,
+  }) : super(key: key);
+
+  final double loadingContainerHeight;
+  final CircularProgressIndicator progressCircle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: loadingContainerHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: progressCircle,
+            ),
+          ),
+        ],
       ),
     );
   }

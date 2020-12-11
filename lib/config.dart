@@ -1,5 +1,4 @@
 import 'package:app/models/AccountModel.dart';
-import 'package:app/models/OrderModel.dart';
 import 'package:flutter/material.dart';
 
 import 'component/common/Categories.dart';
@@ -8,8 +7,8 @@ import 'models/CategoryModel.dart';
 class AppGlobalConfig {
   static final AppGlobalConfig _singleton = AppGlobalConfig._internal();
   static AccountModel account = AccountModel();
-  static OrderModel orders = OrderModel();
-  static String server = 'http://192.168.254.103:4200';
+  static String server = 'https://api.ajdev.me';
+  // static String server = 'http://192.168.254.103:4200';
 
   // Colors
   static Color primaryColor = Color(0xFF5C6BC0);

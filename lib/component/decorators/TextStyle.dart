@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 class AppGlobalStyles {
   static final headingFontSize = 24.0;
   static final titleFontSize = 20.0;
-  static final subtitleFontSize = 16.0;
-  static final paragraphFontSize = 14.0;
-  static final captionFontSize = 12.0;
+  static final subtitleFontSize = 18.0;
+  static final paragraphFontSize = 16.0;
+  static final captionFontSize = 14.0;
   static final AppGlobalStyles _singleton = AppGlobalStyles._internal();
-  static final darkColor = Colors.black54;
+  static final darkColor = Colors.black.withOpacity(0.7);
   // Noramal Dark color Text Styles
   static TextStyle heading =
       TextStyle(fontSize: headingFontSize, color: darkColor);
@@ -77,6 +77,28 @@ class AppGlobalStyles {
     color: AppGlobalConfig.primaryColor,
   );
 
+  //  Orange text
+  static final TextStyle orangeHeading = TextStyle(
+    fontSize: headingFontSize,
+    color: Colors.orange,
+  );
+  static final TextStyle orangeTitle = TextStyle(
+    fontSize: titleFontSize,
+    color: Colors.orange,
+  );
+  static final TextStyle orangeSubtitle = TextStyle(
+    fontSize: subtitleFontSize,
+    color: Colors.orange,
+  );
+  static final TextStyle orangeParagraph = TextStyle(
+    fontSize: paragraphFontSize,
+    color: Colors.orange,
+  );
+  static final TextStyle orangeCaption = TextStyle(
+    fontSize: captionFontSize,
+    color: Colors.orange,
+  );
+
   static TextStyle orangeBoldHeading = TextStyle(
     fontSize: headingFontSize,
     fontWeight: FontWeight.bold,
@@ -84,7 +106,13 @@ class AppGlobalStyles {
   );
 
   static TextStyle orangeBoldSubtitle = TextStyle(
-    fontSize: headingFontSize,
+    fontSize: subtitleFontSize,
+    fontWeight: FontWeight.bold,
+    color: AppGlobalConfig.warningColor,
+  );
+
+  static TextStyle orangeBoldTitle = TextStyle(
+    fontSize: titleFontSize,
     fontWeight: FontWeight.bold,
     color: AppGlobalConfig.warningColor,
   );

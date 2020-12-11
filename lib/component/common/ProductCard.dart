@@ -15,7 +15,7 @@ class ProductCard extends StatelessWidget {
     @required this.onTap,
   }) : super(key: key);
 
-  final double cardHeight = 120.0;
+  final double cardHeight = 130.0;
   final ProductModel product;
   final Function onTap;
 
@@ -52,7 +52,7 @@ class ProductCard extends StatelessWidget {
                       ProductPicture(
                         imgSrc:
                             '${AppGlobalConfig.server}/public/products/${product.productImage}',
-                        width: 120,
+                        // width: 120,
                         height: cardHeight,
                       ),
                       BoxGradient(
