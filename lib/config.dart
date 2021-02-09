@@ -7,8 +7,8 @@ import 'models/CategoryModel.dart';
 class AppGlobalConfig {
   static final AppGlobalConfig _singleton = AppGlobalConfig._internal();
   static AccountModel account = AccountModel();
-  static String server = 'https://api.ajdev.me';
-  // static String server = 'http://192.168.254.103:4200';
+  static String server = 'https://api.innocreativetechsolutions.com';
+  // static String server = 'http://192.168.0.110:4200';
 
   // Colors
   static Color primaryColor = Color(0xFF5C6BC0);
@@ -17,6 +17,11 @@ class AppGlobalConfig {
 
   // Categories
   List<CategoryModel> categories = [
+    CategoryModel(
+      imgSrc: 'assets/background.png',
+      text: 'All Products',
+      value: null,
+    ),
     CategoryModel(
       imgSrc: 'assets/img/beans.png',
       text: 'Rice & Beans',
@@ -83,12 +88,16 @@ class AppGlobalConfig {
       value: 12,
     ),
   ];
-  List<Widget> getCategories() {
+  List<Widget> getCategories(onTap) {
     final self = this;
     List<Widget> categoryCards = [];
     self.categories.forEach((element) {
-      categoryCards
-          .add(CategoryCard(imgSrc: element.imgSrc, text: element.text));
+      categoryCards.add(CategoryCard(
+        imgSrc: element.imgSrc,
+        text: element.text,
+        value: element.value,
+        onTap: onTap,
+      ));
     });
     return categoryCards;
   }

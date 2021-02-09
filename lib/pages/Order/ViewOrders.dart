@@ -121,7 +121,7 @@ class _ViewOrdersState extends State<ViewOrders> {
                     : Column(
                         children: [
                           SizedBox(
-                            height: 55,
+                            height: 65,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
                                   20.0, 8.0, 20.0, 8.0),

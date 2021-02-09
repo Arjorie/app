@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class CategoryCard extends StatefulWidget {
   final imgSrc;
   final text;
+  final value;
+  final Function onTap;
 
   const CategoryCard({
     Key key,
     @required this.imgSrc,
+    @required this.value,
     @required this.text,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -24,7 +28,7 @@ class _CategoryCardState extends State<CategoryCard> {
         semanticContainer: true,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: InkWell(
-          onTap: () => {},
+          onTap: () => {widget.onTap(widget.value)},
           child: Container(
             height: 100,
             alignment: Alignment.bottomCenter,
@@ -36,14 +40,19 @@ class _CategoryCardState extends State<CategoryCard> {
                 fit: BoxFit.cover,
               ),
             ),
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Text(
-                widget.text,
-                style: TextStyle(
-                    color: Colors.white,
-                    backgroundColor: Colors.black.withOpacity(0.4),
-                    fontSize: 20),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    widget.text,
+                    style: TextStyle(
+                        color: Colors.white,
+                        backgroundColor: Colors.black.withOpacity(0.6),
+                        fontSize: 16),
+                  ),
+                ),
               ),
             ),
           ),

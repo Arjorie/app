@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app/component/common/AlertDialog.dart';
-// import 'package:app/component/common/ContainerWithBlurBackground.dart';
 import 'package:app/component/common/MButton.dart';
-// import 'package:app/component/common/SliverTitle.dart';
 import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 import 'package:app/helpers/Storage.dart';
@@ -197,6 +195,7 @@ class _OrderConfirmationState extends State<OrderConfirmation> {
     setState(() {
       isLoading = false;
     });
+    print(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = jsonDecode(response.body);
       setState(() {
@@ -318,11 +317,23 @@ class CustomListContent extends StatelessWidget {
                       ? Row(
                           children: [
                             MButton(
-                              label: 'Order Complete!',
+                              label: 'Pay Later',
                               onPressed: () {
                                 orderStore.resetOrder();
                                 Navigator.of(context)
                                     .popUntil(ModalRoute.withName('/home'));
+                              },
+                            ),
+                            MButton(
+                              label: 'Pay Now',
+                              onPressed: () {
+                                Navigator.of(context).pushNamed(
+                                  '/payment',
+                                  arguments: PageModel(
+                                      title: 'Payment',
+                                      message: orderStore.billId),
+                                );
+                                orderStore.resetOrder();
                               },
                             ),
                           ],

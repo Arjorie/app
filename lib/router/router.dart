@@ -1,3 +1,13 @@
+import 'package:app/pages/Payment/CashPayment.dart';
+import 'package:app/pages/Payment/OnlinePayment.dart';
+import 'package:app/pages/Payment/PaymentOptionsPage.dart';
+import 'package:app/pages/Protected/CancelledOrders.dart';
+import 'package:app/pages/Protected/CompleteOrders.dart';
+import 'package:app/pages/Protected/OrderSummary.dart';
+import 'package:app/pages/Protected/PaidOrders.dart';
+import 'package:app/pages/Protected/PendingOrders.dart';
+import 'package:app/pages/Protected/ServedOrders.dart';
+import 'package:app/pages/Protected/ServingOrders.dart';
 import 'package:flutter/material.dart';
 import 'package:app/pages/Home.dart';
 import 'package:app/pages/Login.dart';
@@ -38,6 +48,41 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case '/order-confirmation':
       return SlideRightRoute(
           widget: OrderConfirmation(), name: '/order-confirmation');
+      break;
+    case '/pending-orders':
+      return SlideRightRoute(widget: PendingOrders(), name: '/pending-orders');
+      break;
+    case '/cancelled-orders':
+      return SlideRightRoute(
+          widget: CancelledOrders(), name: '/cancelled-orders');
+      break;
+    case '/serving-orders':
+      return SlideRightRoute(widget: ServingOrders(), name: '/serving-orders');
+      break;
+    case '/served-orders':
+      return SlideRightRoute(widget: ServedOrders(), name: '/served-orders');
+      break;
+    case '/complete-orders':
+      return SlideRightRoute(
+          widget: CompleteOrders(), name: '/complete-orders');
+      break;
+    case '/paid-orders':
+      return SlideRightRoute(widget: PaidOrders(), name: '/paid-orders');
+      break;
+    case '/payment':
+      return SlideRightRoute(
+          widget: PaymentOptionsPage(data: args), name: '/payment');
+      break;
+    case '/cash-payment':
+      return SlideRightRoute(widget: CashPaymentPage(), name: '/cash-payment');
+      break;
+    case '/online-payment':
+      return SlideRightRoute(
+          widget: OnlinePaymentPage(), name: '/online-payment');
+      break;
+    case '/order-summary':
+      return SlideRightRoute(
+          widget: OrderSummary(data: args), name: '/order-summary');
       break;
     default:
       return SlideRightRoute(widget: Login(data: args));

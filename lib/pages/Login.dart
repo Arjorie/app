@@ -90,7 +90,6 @@ class _LoginState extends State<Login> {
     setState(() {
       isLoading = false;
     });
-
     if (response.statusCode == 200) {
       final Map<String, dynamic> result = jsonDecode(response.body);
       final record = result['record'];

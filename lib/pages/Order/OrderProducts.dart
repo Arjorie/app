@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app/component/common/ConfirmDialog.dart';
+import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/store/OrderStore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -17,7 +18,6 @@ import 'package:app/helpers/Storage.dart';
 import 'package:app/helpers/OrderProcess.dart';
 import 'package:app/models/PageModel.dart';
 import 'package:app/models/ProductModel.dart';
-import 'package:app/component/decorators/TextStyle.dart';
 import 'package:app/config.dart';
 import 'package:provider/provider.dart';
 
@@ -33,18 +33,28 @@ class _OrderProductsState extends State<OrderProducts> {
    */
   bool isLoading = true;
   List<dynamic> products = [];
-  List<Widget> categoryCards = AppGlobalConfig().getCategories();
+  List<Widget> categoryCards = [];
   BuildContext appContext;
   double appBarHeight = 120.0;
   double categoryHeight = 100;
   double loadingContainerHeight;
+  int category;
 
   // initState()
   // - on create/init hook/method of this class
   @override
   void initState() {
     super.initState();
+    categoryCards = AppGlobalConfig().getCategories(this.onTap);
     Timer(Duration(milliseconds: 2400), () async => {this.getProductsData()});
+  }
+
+  /* on tap category */
+  onTap(index) {
+    setState(() {
+      this.category = index;
+    });
+    this.getProductsData();
   }
 
   /* Retrieve products data */
@@ -52,8 +62,14 @@ class _OrderProductsState extends State<OrderProducts> {
     final LocalStorage localStorage = LocalStorage();
     final String token = await localStorage.getString('accessToken');
     final String authorizationHeader = 'Basic $token';
+    final String query =
+        this.category != null ? '?category=${this.category}' : '';
+    final String url = '${AppGlobalConfig.server}/employee/v1/products$query';
+    setState(() {
+      isLoading = true;
+    });
     final response = await http.get(
-      '${AppGlobalConfig.server}/employee/v1/products',
+      url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': authorizationHeader,
@@ -87,7 +103,7 @@ class _OrderProductsState extends State<OrderProducts> {
     loadingContainerHeight = MediaQuery.of(appContext).size.height -
         appBarHeight -
         categoryHeight -
-        160;
+        170;
     if (loadingContainerHeight < 200) loadingContainerHeight = 200;
     CircularProgressIndicator progressCircle = CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
@@ -129,12 +145,12 @@ class _OrderProductsState extends State<OrderProducts> {
                           ContainerWithBlurBackground(contentWidget: null),
                       title: Text('Food Menu'),
                     ),
-                    actions: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.search_rounded),
-                        onPressed: () {},
-                      ),
-                    ],
+                    // actions: <Widget>[
+                    //   IconButton(
+                    //     icon: Icon(Icons.search_rounded),
+                    //     onPressed: () {},
+                    //   ),
+                    // ],
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
@@ -164,7 +180,7 @@ class _OrderProductsState extends State<OrderProducts> {
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
                         return SliverTitle(
-                          leftText: 'All Products',
+                          leftText: 'Products',
                         );
                       },
                       childCount: 1,
@@ -222,7 +238,6 @@ class ProductList extends StatelessWidget {
     final appWidth = MediaQuery.of(context).size.width;
     final itemWidth =
         (isLoading == true && appWidth > 670) ? appWidth : appWidth / 2;
-    print(appWidth);
     final itemHeight = 122;
     final aspectRatio = isLoading == true ? 1 : (itemWidth / itemHeight);
     return orientation == Orientation.portrait
@@ -235,19 +250,52 @@ class ProductList extends StatelessWidget {
                       loadingContainerHeight: loadingContainerHeight,
                       progressCircle: progressCircle);
                 } else {
-                  product = ProductModel.fromJson(products[index]);
-                  return ProductCard(
-                    product: product,
-                    onTap: () => {
-                      onTapProductCard(
-                        productContext,
-                        product,
+                  if (products.length == 0) {
+                    return Container(
+                      height: loadingContainerHeight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Center(
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 120,
+                                      height: 120,
+                                      child: SvgPicture.asset(
+                                        'assets/svg/fried.svg',
+                                        width: 120,
+                                        height: 120,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text('No Products'),
+                                  ]),
+                            ),
+                          ),
+                        ],
                       ),
-                    },
-                  );
+                    );
+                  } else {
+                    product = ProductModel.fromJson(products[index]);
+                    return ProductCard(
+                      product: product,
+                      onTap: () => {
+                        onTapProductCard(
+                          productContext,
+                          product,
+                        ),
+                      },
+                    );
+                  }
                 }
               },
-              childCount: isLoading == true ? 1 : products.length,
+              childCount: isLoading == true
+                  ? 1
+                  : (products.length == 0 ? 1 : products.length),
             ),
           )
         : SliverGrid(
@@ -265,19 +313,46 @@ class ProductList extends StatelessWidget {
                       loadingContainerHeight: loadingContainerHeight,
                       progressCircle: progressCircle);
                 } else {
-                  product = ProductModel.fromJson(products[index]);
-                  return ProductCard(
-                    product: product,
-                    onTap: () => {
-                      onTapProductCard(
-                        productContext,
-                        product,
+                  if (products.length == 0) {
+                    return Container(
+                      height: loadingContainerHeight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Center(
+                              child: SizedBox(
+                                width: 120,
+                                height: 120,
+                                child: SvgPicture.asset(
+                                  'assets/svg/fried.svg',
+                                  width: 120,
+                                  height: 120,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    },
-                  );
+                    );
+                  } else {
+                    product = ProductModel.fromJson(products[index]);
+                    return ProductCard(
+                      product: product,
+                      onTap: () => {
+                        onTapProductCard(
+                          productContext,
+                          product,
+                        ),
+                      },
+                    );
+                  }
                 }
               },
-              childCount: isLoading == true ? 1 : products.length,
+              childCount: isLoading == true
+                  ? 1
+                  : (products.length == 0 ? 1 : products.length),
             ),
           );
   }

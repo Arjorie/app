@@ -16,6 +16,7 @@ class ProductOrderedCard extends StatefulWidget {
     this.onIncrementOrder,
     this.onDecrementOrder,
     this.onRemoveOrder,
+    this.hideControls,
   }) : super(key: key);
 
   final ProductModel product;
@@ -23,6 +24,7 @@ class ProductOrderedCard extends StatefulWidget {
   final Function onDecrementOrder;
   final Function onIncrementOrder;
   final Function onRemoveOrder;
+  final bool hideControls;
 
   @override
   _ProductOrderedCardState createState() => _ProductOrderedCardState();
@@ -67,24 +69,26 @@ class _ProductOrderedCardState extends State<ProductOrderedCard> {
                         width: 120,
                         height: cardHeight,
                       ),
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        width: 30,
-                        height: 30,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.remove_circle,
-                            color: Colors.redAccent,
-                            size: 30.0,
-                          ),
-                          onPressed: () {
-                            if (widget.onRemoveOrder != null) {
-                              widget.onRemoveOrder(widget.product);
-                            }
-                          },
-                        ),
-                      ),
+                      widget.hideControls == true
+                          ? Container()
+                          : Positioned(
+                              top: 0,
+                              left: 0,
+                              width: 30,
+                              height: 30,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.remove_circle,
+                                  color: Colors.redAccent,
+                                  size: 30.0,
+                                ),
+                                onPressed: () {
+                                  if (widget.onRemoveOrder != null) {
+                                    widget.onRemoveOrder(widget.product);
+                                  }
+                                },
+                              ),
+                            ),
                       BoxGradient(
                         height: 90.0,
                         begin: Alignment.topCenter,
@@ -175,92 +179,95 @@ class _ProductOrderedCardState extends State<ProductOrderedCard> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (widget.product.orderCount <
-                                widget.product.quantity) {
-                              widget.product.orderCount =
-                                  widget.product.orderCount + 1;
-                              if (widget.onIncrementOrder != null)
-                                widget.onIncrementOrder();
-                            }
-                          });
-                        },
-                        child: Opacity(
-                          opacity: widget.product.quantity <=
-                                  widget.product.orderCount
-                              ? 0.5
-                              : 1,
-                          child: Container(
-                            height: (cardHeight * 0.34) - 8,
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppGlobalConfig.primaryColor,
-                            ),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                '+',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24.0,
+                    children: widget.hideControls == true
+                        ? []
+                        : [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (widget.product.orderCount <
+                                      widget.product.quantity) {
+                                    widget.product.orderCount =
+                                        widget.product.orderCount + 1;
+                                    if (widget.onIncrementOrder != null)
+                                      widget.onIncrementOrder();
+                                  }
+                                });
+                              },
+                              child: Opacity(
+                                opacity: widget.product.quantity <=
+                                        widget.product.orderCount
+                                    ? 0.5
+                                    : 1,
+                                child: Container(
+                                  height: (cardHeight * 0.34) - 8,
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppGlobalConfig.primaryColor,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '+',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24.0,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: (cardHeight * 0.34) - 8,
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            '${widget.product.orderCount}',
-                            textAlign: TextAlign.center,
-                            style: AppGlobalStyles.primaryBoldTitle,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (widget.product.orderCount > 1) {
-                              widget.product.orderCount =
-                                  widget.product.orderCount - 1;
-                              if (widget.onDecrementOrder != null)
-                                widget.onDecrementOrder();
-                            }
-                          });
-                        },
-                        child: Opacity(
-                          opacity: widget.product.orderCount == 1 ? 0.5 : 1,
-                          child: Container(
-                            height: (cardHeight * 0.34) - 8,
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: AppGlobalConfig.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                '-',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24.0,
+                            Container(
+                              height: (cardHeight * 0.34) - 8,
+                              padding: const EdgeInsets.all(8.0),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${widget.product.orderCount}',
+                                  textAlign: TextAlign.center,
+                                  style: AppGlobalStyles.primaryBoldTitle,
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (widget.product.orderCount > 1) {
+                                    widget.product.orderCount =
+                                        widget.product.orderCount - 1;
+                                    if (widget.onDecrementOrder != null)
+                                      widget.onDecrementOrder();
+                                  }
+                                });
+                              },
+                              child: Opacity(
+                                opacity:
+                                    widget.product.orderCount == 1 ? 0.5 : 1,
+                                child: Container(
+                                  height: (cardHeight * 0.34) - 8,
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: AppGlobalConfig.primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '-',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                   ),
                 ),
               ],

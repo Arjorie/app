@@ -16,30 +16,38 @@ class SliverTitle extends StatelessWidget {
     List<Widget> titleWidgets = [];
     if (leftText != null) {
       titleWidgets.add(
-        Text(
-          leftText,
-          style: AppGlobalStyles.boldTitle,
+        Expanded(
+          child: Text(
+            leftText,
+            style: AppGlobalStyles.boldTitle,
+          ),
         ),
       );
     }
     if (rightText != null) {
       titleWidgets.add(
-        Text(
-          rightText,
-          style: AppGlobalStyles.primarySubtitle,
+        Expanded(
+          child: Text(
+            rightText,
+            style: AppGlobalStyles.primarySubtitle,
+          ),
         ),
       );
     }
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: titleWidgets,
+    return Container(
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: titleWidgets,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -15,20 +15,17 @@ class ProductCard extends StatelessWidget {
     @required this.onTap,
   }) : super(key: key);
 
-  final double cardHeight = 130.0;
+  final double cardHeight = 140.0;
   final ProductModel product;
   final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     final discount = product.discountText;
-    final description = product.description;
     final quantity = product.quantity;
     final originalPrice = product.originalPrice;
     final totalServings = product.totalServings;
     final finalPrice = product.finalPrice;
-    final maxDescriptionLength =
-        description.length > 100 ? 100 : description.length;
     return Container(
       alignment: Alignment.center,
       height: cardHeight,
@@ -96,11 +93,14 @@ class ProductCard extends StatelessWidget {
                           children: [
                             Text(
                               '${product.productName}',
-                              style: AppGlobalStyles.primaryBoldHeading,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppGlobalStyles.primaryBoldTitle,
                             ),
                             Container(
                               child: Text(
-                                '${description.substring(0, maxDescriptionLength)}',
+                                totalServings == 1
+                                    ? '$totalServings Serving'
+                                    : '$totalServings Servings',
                                 style: AppGlobalStyles.paragraph,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -163,30 +163,11 @@ class ProductCard extends StatelessWidget {
                     children: [
                       Container(
                         height: (cardHeight * 0.5) - 4,
-                        padding: const EdgeInsets.all(4.0),
-                        decoration: BoxDecoration(
-                          // shape: BoxShape.circle,
-                          color: AppGlobalConfig.primaryColor,
-                        ),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            totalServings == 1
-                                ? '$totalServings Serving'
-                                : '$totalServings Servings',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: AppGlobalStyles.captionFontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: (cardHeight * 0.5) - 4,
                         decoration: discount != ''
-                            ? BoxDecoration(color: Colors.orangeAccent)
+                            ? BoxDecoration(
+                                color: Colors.orangeAccent,
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20)))
                             : null,
                         child: Align(
                           alignment: Alignment.center,
