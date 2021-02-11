@@ -316,7 +316,7 @@ class _OnlinePaymentPageState extends State<OnlinePaymentPage> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            'Account Name (optional)',
+                                            'Account Name',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -369,7 +369,7 @@ class _OnlinePaymentPageState extends State<OnlinePaymentPage> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            'Bank Name (optional)',
+                                            'Bank Name',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -442,7 +442,13 @@ class _OnlinePaymentPageState extends State<OnlinePaymentPage> {
                         } else if (accountNumberPaidController.text == '') {
                           showAlertDialog(context, 'Field Required!',
                               'Please provide the last 4 digits of your account number!');
-                        } else if (double.parse(amountPaidController.text) <=
+                        } else if (accountNamePaidController.text == '') {
+                          showAlertDialog(context, 'Field Required!',
+                              'Please provide your account name!');
+                        } else if (bankNamePaidController.text == '') {
+                          showAlertDialog(context, 'Field Required!',
+                              'Please provide the name of the bank you used to send the payment!');
+                        } else if (double.parse(amountPaidController.text) <
                             orderStore.totalPrice) {
                           showAlertDialog(context, 'Insufficient Funds!',
                               'Please provide the exact or greater than the amount to pay. Thank you!');

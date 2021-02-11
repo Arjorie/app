@@ -197,7 +197,7 @@ class _CashPaymentPageState extends State<CashPaymentPage> {
                       onPressed: () {
                         isLoading = true;
                         if (amountPaidController.text == '') {
-                        } else if (double.parse(amountPaidController.text) <=
+                        } else if (double.parse(amountPaidController.text) <
                             orderStore.totalPrice) {
                           setState(() {
                             isLoading = false;

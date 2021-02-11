@@ -15,7 +15,7 @@ import 'package:app/pages/Splash.dart';
 import 'package:app/pages/Order/SelectTable.dart';
 import 'package:app/pages/Order/OrderProducts.dart';
 import 'package:app/pages/Order/ViewOrders.dart';
-import 'package:app/pages/Order/PaymentOptions.dart';
+// import 'package:app/pages/Order/PaymentOptions.dart';
 import 'package:app/pages/Order/OrderConfirmation.dart';
 
 import 'package:app/models/PageModel.dart';
@@ -41,10 +41,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case '/view-orders':
       return SlideRightRoute(widget: ViewOrders(), name: '/view-orders');
       break;
-    case '/payment-options':
-      return SlideRightRoute(
-          widget: PaymentOptions(), name: '/payment-options');
-      break;
+    // case '/payment-options':
+    //   return SlideRightRoute(
+    //       widget: PaymentOptions(), name: '/payment-options');
+    //   break;
     case '/order-confirmation':
       return SlideRightRoute(
           widget: OrderConfirmation(), name: '/order-confirmation');

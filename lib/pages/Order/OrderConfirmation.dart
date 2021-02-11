@@ -333,7 +333,6 @@ class CustomListContent extends StatelessWidget {
                                       title: 'Payment',
                                       message: orderStore.billId),
                                 );
-                                orderStore.resetOrder();
                               },
                             ),
                           ],

@@ -157,9 +157,10 @@ class _ViewOrdersState extends State<ViewOrders> {
                                 label: 'Confirm Order',
                                 flex: 2,
                                 backgroundColor: AppGlobalConfig.primaryColor,
-                                onPressed: () => {
+                                onPressed: () {
+                                  orderStore.totalPrice = totalPrice;
                                   Navigator.pushNamed(
-                                      context, '/order-confirmation')
+                                      context, '/order-confirmation');
                                 },
                               ),
                             ],

@@ -91,6 +91,7 @@ class PaymentOptionsPageState extends State<PaymentOptionsPage> {
   @override
   Widget build(BuildContext context) {
     final orderState = Provider.of<OrderStore>(context);
+    print(orderState.totalPrice);
     // Access page data
     PageModel data = widget.data;
     appContext = context;
